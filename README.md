@@ -25,6 +25,8 @@ When managing infrastructure on AWS, detecting and responding to security incide
 To solve these challenges, I built a fully automated incident response pipeline. This pipeline instantly detects malicious activity, isolates compromised instances, tags affected resources clearly, and alerts the security team through real-time notifications.
 
 ## 2. Architecture Diagram & Data Flow
+<img width="1820" height="1253" alt="image" src="https://github.com/user-attachments/assets/6e1312fc-dd6d-46ac-86d8-4c11a8072242" />
+
 
 ## 3. Tools & AWS Services Used
 1. Amazon EC2
