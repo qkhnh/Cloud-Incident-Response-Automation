@@ -38,3 +38,37 @@ To solve these challenges, I built a fully automated incident response pipeline.
 7. Amazon CloudWatch
 8. AWS IAM
 9. AWS Lambda
+
+
+## 4. Build Steps
+
+4.1 Create a custom Threat-IP list (S3) 
+1. Open Notepad, VS Code, or any plain text editor then type the attacker's IP address (no headers or quotes)
+2. Save the file and note it down for later
+3. AWS Console → S3 → Create bucket
+4. Enter a bucket name (e.g., GD-Threat-List) → leave defaults → Create bucket
+5. Open the bucket → Upload → Add files → choose the file you created just now → Upload
+6. Copy the Object URL (you’ll paste it into GuardDuty in Step 4.3)
+
+4.2 Create an SNS topic for alerts
+1. Console → SNS → Topics → Create topic
+2. Type: Standard | Name: (e.g., incident-alerts) → Create topic
+3. Inside the topic → Create subscription
+    - Protocol: Email | Endpoint: your email
+4. Click Create subscription → open the confirmation e-mail and click Confirm subscription
+5. Copy the Topic ARN (needed for Lambda env var)
+
+4.3 Enable GuardDuty & ingest your Threat-IP list
+1. Console → GuardDuty → Get started / Enable (if not already on)
+2. Left nav → Lists ▸ Add a threat ip list 
+    - Name: (e.g., CustomThreatIPs) | Format: Plaintext
+    - Location: paste S3 object URL from Step 4.1
+    - Add list
+3. Get the Detector ID:
+    - Left nav → Settings → "Detector" section.
+    - Note down the Detector ID.
+  
+4.4 Turn on VPC Flow Logs (to CloudWatch)
+
+
+
