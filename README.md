@@ -42,7 +42,7 @@ To solve these challenges, I built a fully automated incident response pipeline.
 
 ## 4. Build Steps
 
-4.1 Create a custom Threat-IP list (S3) 
+### 4.1 Create a custom Threat-IP list (S3) 
 1. Open Notepad, VS Code, or any plain text editor then type the attacker's IP address (no headers or quotes)
 2. Save the file and note it down for later
 3. AWS Console → S3 → Create bucket
@@ -50,25 +50,50 @@ To solve these challenges, I built a fully automated incident response pipeline.
 5. Open the bucket → Upload → Add files → choose the file you created just now → Upload
 6. Copy the Object URL (you’ll paste it into GuardDuty in Step 4.3)
 
-4.2 Create an SNS topic for alerts
+### 4.2 Create an SNS topic for alerts
 1. Console → SNS → Topics → Create topic
-2. Type: Standard | Name: (e.g., incident-alerts) → Create topic
+2. Type: Standard | Name: GD-incident-alerts (e.g., IncidentAlerts, incident-alerts) → Create topic
 3. Inside the topic → Create subscription
     - Protocol: Email | Endpoint: your email
 4. Click Create subscription → open the confirmation e-mail and click Confirm subscription
 5. Copy the Topic ARN (needed for Lambda env var)
 
-4.3 Enable GuardDuty & ingest your Threat-IP list
+### 4.3 Enable GuardDuty & enter your Threat-IP list
 1. Console → GuardDuty → Get started / Enable (if not already on)
 2. Left nav → Lists ▸ Add a threat ip list 
-    - Name: (e.g., CustomThreatIPs) | Format: Plaintext
+    - Name: Threat-ip-list (e.g., CustomThreatIPs, ipthreatlist) | Format: Plaintext
     - Location: paste S3 object URL from Step 4.1
     - Add list
 3. Get the Detector ID:
     - Left nav → Settings → "Detector" section.
     - Note down the Detector ID.
   
-4.4 Turn on VPC Flow Logs (to CloudWatch)
+### 4.4 Turn on VPC Flow Logs (to CloudWatch)
+1. Console ▸ VPC ▸ Your VPCs → select default VPC
+2. Tabs → Flow Logs → Create flow log
+    - Filter All
+    - Destination Send to CloudWatch Logs
+    - Create new log group (e.g, vpc-flow-logs, Flow-logs)
+    - IAM role Create new (vpc-flow-logs-role)
+    - Create flow log
 
+### 4.5 Network and Security Groups
+1. Create quarantine SG
+- Console → EC2 → Security Groups → Create
+    - Name: sg_deny_all (e.g., sg_deny_all, sg_block_everything)
+    - VPC: default
+    - Inbound : Remove all → empty
+    - Outbound : Remove all → empty → Create security group
 
-
+2. Create SG for "Target"
+    - Name: sg_target (e.g., TARGET, target_sg)
+    - Inbound → Add rule SSH 22 | Source: 0.0.0.0/0
+    - Inbound → Add rule HTTP 80 | Source: 0.0.0.0/0
+    - Outbound → default → Create
+  
+3. Create SG for "Attacker"
+    - Name sg_attacker (e.g., ATTACKER, attacker_sg)
+    - Inbound → Add rule SSH 22 | Source: My IP
+    - Outbound = default → Create
+   
+### 4.6 Launch EC2 instances
