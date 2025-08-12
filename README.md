@@ -69,7 +69,7 @@ To solve these challenges, I built a fully automated incident response pipeline.
     - Note down the Detector ID.
   
 ### 4.4 Turn on VPC Flow Logs (to CloudWatch)
-1. Console ▸ VPC ▸ Your VPCs → select default VPC
+1. Console → VPC → Your VPCs → select default VPC
 2. Tabs → Flow Logs → Create flow log
     - Filter All
     - Destination Send to CloudWatch Logs
@@ -92,8 +92,49 @@ To solve these challenges, I built a fully automated incident response pipeline.
     - Outbound → default → Create
   
 3. Create SG for "Attacker"
-    - Name sg_attacker (e.g., ATTACKER, attacker_sg)
+    - Name: sg_attacker (e.g., ATTACKER, attacker_sg)
     - Inbound → Add rule SSH 22 | Source: My IP
     - Outbound = default → Create
    
 ### 4.6 Launch EC2 instances
+1. Launch Target instance
+- Console → EC2 → Launch instances
+- Name: target-instance (e.g., Target, TARGET-EC2)
+- AMI: Amazon Linux 2 (free tier eligible)
+- Instance type: t2.micro
+- Key pair: create or select existing key (download .pem file if new)
+- Network settings:
+    - VPC: default
+    - Subnet: default
+    - Auto-assign public IP: Enable
+    - Security group: Select sg_target from Step 4.5
+- Storage: leave default (8 GB gp2)
+- Launch instance
+
+2. Launch Attacker instance 
+- Console → EC2 → Launch instances
+    - Name: attacker-instance (e.g., Attacker, Attacker-EC2)
+    - AMI: Kali Linux
+    - Instance type: t2.micro
+    - Key pair: create or select existing key (download .pem file if new)
+    - Network settings:
+        - VPC: default
+        - Subnet: default
+        - Auto-assign public IP: Enable
+        - Security group: Select sg_attacker from Step 4.5
+    - Storage: leave default (8 GB gp2)
+    - Launch instance
+ 
+  ### 4.7 Create Incident Response Lambda (Quarantine)
+Console → Lambda → Create function
+Name: GuardDutyIncidentResponder
+Runtime: Python 3.x
+Permissions: Create a new role with basic Lambda permissions
+Create function
+Add environment variables:
+BLOCKING_SG_ID = <sg_deny_all ID>
+SNS_TOPIC_ARN = <SNS Topic ARN from Step 4.2>
+Paste the GuardDuty incident response code (quarantines instance by replacing SG, tags instance, sends SNS notification)
+Deploy
+
+
