@@ -184,7 +184,10 @@ To solve these challenges, I built a fully automated incident response pipeline.
 3. IAM for Restore role:
 - EC2:
     - DescribeInstances
-    - ModifyNetworkInterfaceAttribute,
+    - ModifyNetworkInterfaceAttribute
+    - DescribeNetworkInterfaces
     - CreateTags
     - DeleteTags
-Logs for this function
+- SNS:
+    - Publish
+- IAM → Role → Select your role → Attach policies → AWSLambdaBasicExecutionRole
