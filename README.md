@@ -125,16 +125,42 @@ To solve these challenges, I built a fully automated incident response pipeline.
     - Storage: leave default (8 GB gp2)
     - Launch instance
  
-  ### 4.7 Create Incident Response Lambda (Quarantine)
-Console → Lambda → Create function
-Name: GuardDutyIncidentResponder
-Runtime: Python 3.x
-Permissions: Create a new role with basic Lambda permissions
-Create function
-Add environment variables:
-BLOCKING_SG_ID = <sg_deny_all ID>
-SNS_TOPIC_ARN = <SNS Topic ARN from Step 4.2>
-Paste the GuardDuty incident response code (quarantines instance by replacing SG, tags instance, sends SNS notification)
-Deploy
-
-
+ ### 4.7 Create Incident Response Lambda (Quarantine)
+1. Console → Lambda → Create function
+    - Name: GuardDutyIncidentResponder
+    - Runtime: Python 3.x
+    - Permissions: Create a new role with basic Lambda permissions → Create function
+  
+2. Add environment variables (Configuration → Environment variables → Edit → Add):
+    - BLOCKING_SG_ID = sg_deny_all ID (from 4.5)
+    - SNS_TOPIC_ARN_NEW = SNS Topic ARN (from 4.2)
+    - APPROVAL_BASE_URL = temporary placeholder (e.g., https://example.com/placeholder). You’ll set the real Function URL in 4.12
+    - APPROVAL_SECRET_PARAM = SSM param name you’ll create in 4.9 (e.g., /guardduty/approval/secret)
+    - INCIDENT_TOKENS_TABLE = IncidentTokens (you’ll create in 4.8)
+    - EXPIRE_MINUTES = 60 (or a custom number that you want)
+    - INSTANCE_TAG_KEY = IncidentStatus
+    - QUARANTINED_VALUE = Quarantined
+      
+3. Paste code into the function editor → Deploy.
+- Code should:
+    - Describe instance → loop each ENI → replace SGs with deny-all.
+    - Tag instance: OriginalSGs=<csv> and IncidentStatus=Quarantined.
+    - Generate token = uuid4().hex, expires_at = now + EXPIRE_MINUTES*60.
+    - Sign instanceId|findingId|token with HMAC-SHA256 (secret from SSM).
+    - Build approval URL with token + sig (+ findingTitle) and publish to SNS.
+      
+4. Attach minimal IAM to the role (Configuration → Permissions → Role name → Add inline policy):
+    - EC2: DescribeInstances, ModifyNetworkInterfaceAttribute, CreateTags
+    - DynamoDB (table: IncidentTokens): PutItem
+    - SNS: Publish on your topic ARN
+    - SSM: GetParameter (with decryption) on your secret
+    - Logs: CloudWatch Logs permissions
+      
+### 4.8 Create DynamoDB Table for Approval Tokens
+1. Console → DynamoDB → Create table
+2. Table name: IncidentTokens
+3. Partition key: token (String) → Create table
+4. Enable TTL (Table → Additional settings → TTL):
+    - Attribute name: expires_at → Enable
+5. Item shape (what Lambdas will store/read):
+    - token (PK), instanceId, findingId, findingTitle, created_at (int), expires_at (int), used (bool)
