@@ -164,3 +164,27 @@ To solve these challenges, I built a fully automated incident response pipeline.
     - Attribute name: expires_at → Enable
 5. Item shape (what Lambdas will store/read):
     - token (PK), instanceId, findingId, findingTitle, created_at (int), expires_at (int), used (bool)
+      
+### 4.9 Create SSM Parameter (HMAC Secret)
+1. Console → Systems Manager → Parameter Store → Create parameter
+2. Name: /guardduty/approval/secret (or your chosen path)
+3. Type: SecureString
+4. Value: a long random string (≥32 chars) → Create parameter
+5. You’ll reference this name in both Lambdas via APPROVAL_SECRET_PARAM.
+
+### 4.10 Create Restore Lambda (Reapply Original SGs)
+1. Console → Lambda → Create function
+    - Name: RestoreGuardDutyInstance
+    - Runtime: Python 3.x → Create function
+2. Behavior (paste code → Deploy):
+    - Read instanceId from event.
+    - Read OriginalSGs tag from instance, split to list.
+    - For each ENI, call ModifyNetworkInterfaceAttribute(Groups=<original list>).
+    - Tag IncidentStatus=Healthy.
+3. IAM for Restore role:
+- EC2:
+    - DescribeInstances
+    - ModifyNetworkInterfaceAttribute,
+    - CreateTags
+    - DeleteTags
+Logs for this function
