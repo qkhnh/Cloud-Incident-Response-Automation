@@ -181,9 +181,12 @@ To solve these challenges, I built a fully automated incident response pipeline.
     - Read OriginalSGs tag from instance, split to list.
     - For each ENI, call ModifyNetworkInterfaceAttribute(Groups=<original list>).
     - Tag IncidentStatus=Healthy.
-3. Environment variables: ################################################################################
-   
-4. IAM for Restore role:
+3. Environment variables:
+    - RESTORE_FUNCTION_NAME = RestoreGuardDutyInstance
+    - RESTORED_VALUE = Healthy
+    - INSTANCE_TAG_KEY = IncidentStatus
+    - SNS_TOPIC_ARN_NEW = Your SNS Topic ARN
+5. IAM for Restore role:
 - EC2:
     - DescribeInstances
     - ModifyNetworkInterfaceAttribute
@@ -223,3 +226,16 @@ To solve these challenges, I built a fully automated incident response pipeline.
     - InvokeFunction
 - CloudWatch Logs
     - Attach AWSLambdaBasicExecutionRole (creates/puts logs)
+      
+### 4.12 Update Responder’s APPROVAL_BASE_URL
+- Go back to GuardDutyIncidentResponder → Configuration → Env vars → Edit.
+- Set APPROVAL_BASE_URL = the Function URL from 4.11 (no trailing slash).
+- Save → Deploy the responder again.
+  
+### 4.13 Create EventBridge Rule (GuardDuty → Responder)
+- Console → Amazon EventBridge → Rules → Create rule
+    - Name: GuardDutyToIncidentResponder
+    - Rule type: Rule with an event pattern → Next
+    - Event source: AWS services → GuardDuty → Event type: GuardDuty Finding → Next
+    - Target: Lambda function → GuardDutyIncidentResponder → Next → Create rule
+
