@@ -181,7 +181,9 @@ To solve these challenges, I built a fully automated incident response pipeline.
     - Read OriginalSGs tag from instance, split to list.
     - For each ENI, call ModifyNetworkInterfaceAttribute(Groups=<original list>).
     - Tag IncidentStatus=Healthy.
-3. IAM for Restore role:
+3. Environment variables: ################################################################################
+   
+4. IAM for Restore role:
 - EC2:
     - DescribeInstances
     - ModifyNetworkInterfaceAttribute
@@ -190,4 +192,34 @@ To solve these challenges, I built a fully automated incident response pipeline.
     - DeleteTags
 - SNS:
     - Publish
-- IAM → Role → Select your role → Attach policies → AWSLambdaBasicExecutionRole
+- CloudWatch Logs
+    - Attach AWSLambdaBasicExecutionRole (creates/puts logs)
+
+### 4.11 Create Confirm Approval Lambda (+ Function URL)
+1. Console → Lambda → Create function
+    - Name: ConfirmApproval
+    - Runtime: Python 3.x → Create function
+2. Environment variables:
+    - RESTORE_FUNCTION_NAME = RestoreGuardDutyInstance
+    - INCIDENT_TOKENS_TABLE = IncidentTokens
+    - APPROVAL_SECRET_PARAM = /guardduty/approval/secret
+3. Expose HTTP endpoint: Configuration → Function URL → Create function URL
+    - Auth type: NONE (for demo/testing) → Save
+    - Copy the Function URL.
+4. Paste code (then Deploy). Code should:
+    - Parse QS: instanceId, findingId, findingTitle?, token, sig, confirm.
+    - Validate token record from DynamoDB:
+        - Exists, used == False, now < expires_at, IDs match.
+        - HMAC signature matches (secret from SSM).
+    - Show centered confirmation page using findingTitle (fallback to ID).
+    - On Approve (confirm=1): conditional update used=true, then InvokeFunction(RESTORE_FUNCTION_NAME, InvocationType="Event").
+5. IAM for ConfirmApproval role:
+- DynamoDB (table: IncidentTokens)
+    - GetItem
+    - UpdateItem
+- SSM Parameter Store (param: /guardduty/approval/secret)
+    - GetParameter
+- Lambda (function: RestoreGuardDutyInstance)
+    - InvokeFunction
+- CloudWatch Logs
+    - Attach AWSLambdaBasicExecutionRole (creates/puts logs)
