@@ -238,4 +238,6 @@ To solve these challenges, I built a fully automated incident response pipeline.
     - Rule type: Rule with an event pattern → Next
     - Event source: AWS services → GuardDuty → Event type: GuardDuty Finding → Next
     - Target: Lambda function → GuardDutyIncidentResponder → Next → Create rule
+ 
+## 5. Attack Simulation & Results
 
