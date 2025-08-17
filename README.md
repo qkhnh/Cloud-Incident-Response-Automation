@@ -36,8 +36,9 @@ To solve these challenges, I built a fully automated incident response pipeline.
 5. Amazon GuardDuty
 6. Amazon VPC
 7. Amazon CloudWatch
-8. AWS IAM
-9. AWS Lambda
+8. Amazon DynamoDB
+9. AWS IAM
+10. AWS Lambda
 
 
 ## 4. Build Steps
