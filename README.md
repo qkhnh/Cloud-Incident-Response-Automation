@@ -241,4 +241,8 @@ To solve these challenges, I built a fully automated incident response pipeline.
     - Target: Lambda function → GuardDutyIncidentResponder → Next → Create rule
  
 ## 5. Attack Simulation & Results
+### 5.1 Attacks Conducted
+Two different attacks were performed from the Kali EC2 instance against the Target EC2 instance in order to trigger GuardDuty findings:
+- SSH Brute-Force Attack: GuardDuty detected repeated failed SSH login attempts originating from the attacker instance, classifying it as a brute-force attack against the Target EC2.
+- Communication with Custom Threat List: Since the attacker’s IP address had been added to the custom Threat-IP list (S3), any communication between the Target EC2 and this IP was flagged. GuardDuty raised a finding that the Target EC2 was communicating with an IP on the custom threat list.
 
