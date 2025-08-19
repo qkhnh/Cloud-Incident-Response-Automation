@@ -4,7 +4,7 @@ This project automates threat detection and response in AWS using GuardDuty, Eve
 
 
 
-## Table of Contents
+# Table of Contents
 1. Project Overview & Objectives
 
 2. Architecture Diagram & Data Flow
@@ -19,16 +19,16 @@ This project automates threat detection and response in AWS using GuardDuty, Eve
 
 
 
-## 1. Project Overview & Objectives
+# 1. Project Overview & Objectives
 When managing infrastructure on AWS, detecting and responding to security incidents quickly is essential. Manual incident response processes such as identifying compromised EC2 instances, isolating them, and notifying the security team can take significant time and effort. During this delay, attackers may continue exfiltrating sensitive data, causing increased security risks and potential damage to the business.
 
 To solve these challenges, I built a fully automated incident response pipeline. This pipeline instantly detects malicious activity, isolates compromised instances, tags affected resources clearly, and alerts the security team through real-time notifications.
 
-## 2. Architecture Diagram & Data Flow
+# 2. Architecture Diagram & Data Flow
 <img width="1820" height="1253" alt="image" src="https://github.com/user-attachments/assets/6e1312fc-dd6d-46ac-86d8-4c11a8072242" />
 
 
-## 3. Tools & AWS Services Used
+# 3. Tools & AWS Services Used
 1. Amazon EC2
 2. Amazon S3
 3. Amazon SNS
@@ -41,7 +41,7 @@ To solve these challenges, I built a fully automated incident response pipeline.
 10. AWS Lambda
 
 
-## 4. Build Steps
+# 4. Build Steps
 
 ### 4.1 Create a custom Threat-IP list (S3) 
 1. Open Notepad, VS Code, or any plain text editor then type the attacker's IP address (no headers or quotes)
@@ -240,7 +240,7 @@ To solve these challenges, I built a fully automated incident response pipeline.
     - Event source: AWS services → GuardDuty → Event type: GuardDuty Finding → Next
     - Target: Lambda function → GuardDutyIncidentResponder → Next → Create rule
  
-## 5. Attack Simulation & Results
+# 5. Attack Simulation & Results
 ### 5.1 Attacks Conducted
 Two different attacks were performed from the Kali EC2 instance against the Target EC2 instance in order to trigger GuardDuty findings:
 - SSH Brute-Force Attack: GuardDuty detected repeated failed SSH login attempts originating from the attacker instance, classifying it as a brute-force attack against the Target EC2.
@@ -253,29 +253,29 @@ Two different attacks were performed from the Kali EC2 instance against the Targ
    <img width="1306" height="78" alt="image" src="https://github.com/user-attachments/assets/7b57677b-6240-4e20-8264-6fe57a585ad2" />
 
 ### 5.3 Automatic Quarantine
-1. Once GuardDuty raises a finding, the EventBridge rule forwards it to your IncidentResponder Lambda.
+1. Once GuardDuty raises a finding, the EventBridge rule forwards it to IncidentResponder Lambda.
 2. The Lambda automatically:
 - Tags the target instance as Quarantined.
 - Detaches its current Security Group(s).
 - Attaches the Deny-All Security Group to block all inbound/outbound traffic.
 - Publishes an alert to the SNS Topic you created.
 
-## Target EC2 Tags showing "Quarantined"
+## Target EC2 Tags after "Quarantined"
 <img width="954" height="289" alt="image" src="https://github.com/user-attachments/assets/c28d8e68-149b-4401-8eb8-57a2ac23f1da" />
 
-## Target EC2 Security group
+## Target EC2 Security group after "Quarantined"
 <img width="591" height="249" alt="image" src="https://github.com/user-attachments/assets/af898f1e-57cb-43e1-9a48-ebf5ba998d49" />
 
-## Alert email (with approval URL)
+## Incident Notification Email after Quarantine (with approval URL)
 <img width="1668" height="626" alt="image" src="https://github.com/user-attachments/assets/b1a5fea7-5d65-4c36-bc0b-cc0b5aaf53f8" />
 
-## 6. Restoration
+# 6. Restoration
 ### 6.1 Approval Link (Email → Confirmation Page)
 1. After quarantine, an SNS email was delivered containing an approval link (already captured in Step 5).
 2. When the link is opened, the Confirmation page displays the GuardDuty Finding Title and the Target Instance ID, allowing an authorized user to confirm the restoration.
 3. The link includes a signed token with an expiry window (configurable via the ConfirmApproval Lambda’s environment variable, e.g., LINK_TTL_SECONDS). Expired links are rejected, preventing unauthorized or stale approvals.
 
-## Confimation page
+## Confirmation page
 <img width="2068" height="1094" alt="image" src="https://github.com/user-attachments/assets/29e7566b-8280-4a56-93dd-f5816d626956" />
 
 ## After clicking Approve
@@ -285,6 +285,7 @@ Two different attacks were performed from the Kali EC2 instance against the Targ
 <img width="2054" height="1099" alt="image" src="https://github.com/user-attachments/assets/fd164f6c-16de-456e-809b-f1b40b1d07e6" />
 
 ## After the link expired
+<img width="2079" height="1091" alt="image" src="https://github.com/user-attachments/assets/3bfb63d3-0b01-4ec6-a674-5e0d959d6679" />
 
 
 
@@ -305,14 +306,14 @@ The Restore Lambda performs the following actions:
     - Publishes an SNS message indicating the instance has been restored, including instanceId, findingId, and findingTitle.
     - Writes structured logs to CloudWatch for audit (approval source, token validity, actor IP/user-agent if captured).
 
-## Restore confirmation email
+## Restoration Notification Email
 <img width="1678" height="436" alt="image" src="https://github.com/user-attachments/assets/f35e4b79-4e30-40c5-9140-a70a23dc19f5" />
 
-## EC2's tags after restoration
+## Target EC2 Tags after "Restored"
 <img width="937" height="269" alt="image" src="https://github.com/user-attachments/assets/1efe17c8-02d3-4c97-b8dd-233eee897534" />
 
 
-## EC2's security group after restoration
+## Target EC2 Security group after "Restored"
 <img width="594" height="259" alt="image" src="https://github.com/user-attachments/assets/f2e600a7-c047-4cd9-8374-9f2db159e2bc" />
 
 
