@@ -6,13 +6,11 @@ from botocore.exceptions import ClientError
 log = logging.getLogger()
 log.setLevel(logging.INFO)
 
-# --- clients ---
 ec2  = boto3.client("ec2")
 sns  = boto3.client("sns")
 ssm  = boto3.client("ssm")
 ddb  = boto3.resource("dynamodb")
 
-# --- env ---
 BLOCKING_SG_ID       = os.environ["BLOCKING_SG_ID"]
 SNS_TOPIC_ARN        = os.environ["SNS_TOPIC_ARN_NEW"]
 APPROVAL_BASE_URL    = (os.environ.get("APPROVAL_BASE_URL")
@@ -23,11 +21,11 @@ EXPIRE_MINUTES       = int(os.environ.get("EXPIRE_MINUTES", "60"))
 INSTANCE_TAG_KEY     = os.environ.get("INSTANCE_TAG_KEY", "IncidentStatus")
 QUARANTINED_VALUE    = os.environ.get("QUARANTINED_VALUE", "Quarantined")
 
-# --- sample finding override (keep) ---
+# sample finding override 
 TEST_INSTANCE_ID = "i-014802609759663a1"
 SAMPLE_ID_REGEX  = r"i-9{8,17}"
 
-# --- helpers ---
+# helpers 
 def _get_secret_bytes():
     p = ssm.get_parameter(Name=APPROVAL_SECRET_PARAM, WithDecryption=True)
     return p["Parameter"]["Value"].encode("utf-8")
@@ -156,3 +154,4 @@ def lambda_handler(event, context):
 
     log.info("SNS sent MessageId=%s", resp["MessageId"])
     return {"status": "done"}
+
