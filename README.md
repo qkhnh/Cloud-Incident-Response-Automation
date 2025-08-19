@@ -15,7 +15,7 @@ This project automates threat detection and response in AWS using GuardDuty, Eve
 
 5. Attack Simulation & Results
 
-6. Appendix
+6. Restoration
 
 
 
@@ -266,8 +266,41 @@ Two different attacks were performed from the Kali EC2 instance against the Targ
 ## Target EC2 Security group
 <img width="548" height="293" alt="image" src="https://github.com/user-attachments/assets/b5123e1b-99d8-48ab-8d60-2709a38232ce" />
 
-## Alert email
+## Alert email (with approval URL)
 <img width="1668" height="626" alt="image" src="https://github.com/user-attachments/assets/b1a5fea7-5d65-4c36-bc0b-cc0b5aaf53f8" />
+
+## 6. Restoration
+### 6.1 Approval Link (Email → Confirmation Page)
+1. After quarantine, an SNS email was delivered containing an approval link (already captured in Step 5).
+2. When the link is opened, the Confirmation page displays the GuardDuty Finding Title and the Target Instance ID, allowing an authorized user to confirm the restoration.
+3. The link includes a signed token with an expiry window (configurable via the ConfirmApproval Lambda’s environment variable, e.g., LINK_TTL_SECONDS). Expired links are rejected, preventing unauthorized or stale approvals.
+
+## Confimation page
+<img width="2068" height="1094" alt="image" src="https://github.com/user-attachments/assets/29e7566b-8280-4a56-93dd-f5816d626956" />
+
+## After clicking Approve
+<img width="2080" height="1105" alt="image" src="https://github.com/user-attachments/assets/30e6acd8-b9f5-4a4c-a84e-e68a9bc07ef9" />
+
+
+### 6.2 Approval → Restore Workflow
+Upon approval, the ConfirmApproval Lambda invokes the Restore Lambda with payload containing:
+- instanceId
+- findingId
+- findingTitle (for audit/logging)
+- source (e.g., email-approval)
+
+The Restore Lambda performs the following actions:
+1. Reattach Original Security Groups:
+    - Retrieves and reapplies the original SG set saved by the Incident Responder (or from instance metadata/tag, e.g., OriginalSecurityGroups).
+    - Detaches the Deny-All SG from the primary ENI.
+2. Update Tags & Status:
+    - Replaces Quarantined with Healthy in Tags and records ResponsePhase=Restored, RestoredAt=<timestamp> in CloudWatch Logs.
+3. Notify & Log:
+    - Publishes an SNS message indicating the instance has been restored, including instanceId, findingId, and findingTitle.
+    - Writes structured logs to CloudWatch for audit (approval source, token validity, actor IP/user-agent if captured).
+
+## Restore confirmation email
+<img width="1678" height="436" alt="image" src="https://github.com/user-attachments/assets/f35e4b79-4e30-40c5-9140-a70a23dc19f5" />
 
 
 
