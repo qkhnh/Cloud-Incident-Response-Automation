@@ -269,7 +269,7 @@ Two different attacks were performed from the Kali EC2 instance against the Targ
 ## Incident Notification Email after Quarantine (with approval URL)
 <img width="1668" height="626" alt="image" src="https://github.com/user-attachments/assets/b1a5fea7-5d65-4c36-bc0b-cc0b5aaf53f8" />
 
-## 6. Restoration
+# 6. Restoration
 ### 6.1 Approval Link (Email → Confirmation Page)
 1. After quarantine, an SNS email was delivered containing an approval link (already captured in Step 5).
 2. When the link is opened, the Confirmation page displays the GuardDuty Finding Title and the Target Instance ID, allowing an authorized user to confirm the restoration.
