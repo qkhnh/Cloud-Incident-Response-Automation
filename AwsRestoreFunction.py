@@ -52,7 +52,7 @@ def lambda_handler(event, context):
     """
     log.info("EVENT: %s", json.dumps(event))
 
-    # accept lowercase instanceId too
+    # accept lowercase instanceId as well
     instance_ids = []
     if event.get("InstanceIds"):
         instance_ids = event["InstanceIds"]
@@ -98,8 +98,7 @@ def lambda_handler(event, context):
 
         _notify_restored(instance_id, original_sg_ids)
         restored.append(instance_id)
-
-    # return summary (no JSON email sent)
+        
     return {
         "event": "RestoreApproved",
         "restored": restored,
@@ -107,3 +106,4 @@ def lambda_handler(event, context):
         "source": event.get("source"),
         "findingId": event.get("findingId"),
     }
+
