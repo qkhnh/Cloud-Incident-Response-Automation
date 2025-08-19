@@ -264,7 +264,7 @@ Two different attacks were performed from the Kali EC2 instance against the Targ
 <img width="954" height="289" alt="image" src="https://github.com/user-attachments/assets/c28d8e68-149b-4401-8eb8-57a2ac23f1da" />
 
 ## Target EC2 Security group
-<img width="548" height="293" alt="image" src="https://github.com/user-attachments/assets/b5123e1b-99d8-48ab-8d60-2709a38232ce" />
+<img width="591" height="249" alt="image" src="https://github.com/user-attachments/assets/af898f1e-57cb-43e1-9a48-ebf5ba998d49" />
 
 ## Alert email (with approval URL)
 <img width="1668" height="626" alt="image" src="https://github.com/user-attachments/assets/b1a5fea7-5d65-4c36-bc0b-cc0b5aaf53f8" />
@@ -280,6 +280,12 @@ Two different attacks were performed from the Kali EC2 instance against the Targ
 
 ## After clicking Approve
 <img width="2080" height="1105" alt="image" src="https://github.com/user-attachments/assets/30e6acd8-b9f5-4a4c-a84e-e68a9bc07ef9" />
+
+## After using the link
+<img width="2054" height="1099" alt="image" src="https://github.com/user-attachments/assets/fd164f6c-16de-456e-809b-f1b40b1d07e6" />
+
+## After the link expired
+
 
 
 ### 6.2 Approval → Restore Workflow
@@ -301,6 +307,15 @@ The Restore Lambda performs the following actions:
 
 ## Restore confirmation email
 <img width="1678" height="436" alt="image" src="https://github.com/user-attachments/assets/f35e4b79-4e30-40c5-9140-a70a23dc19f5" />
+
+## EC2's tags after restoration
+<img width="937" height="269" alt="image" src="https://github.com/user-attachments/assets/1efe17c8-02d3-4c97-b8dd-233eee897534" />
+
+
+## EC2's security group after restoration
+<img width="594" height="259" alt="image" src="https://github.com/user-attachments/assets/f2e600a7-c047-4cd9-8374-9f2db159e2bc" />
+
+
 
 
 
