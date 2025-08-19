@@ -11,7 +11,7 @@ This project automates threat detection and response in AWS using GuardDuty, Eve
 
 3. Tools & AWS Services Used
 
-4. Build Steps (Terraform / Console) (s3 in here as well, include code snapshot in step that have it and explain it briefly in this part as well)
+4. Build Steps 
 
 5. Attack Simulation & Results
 
@@ -245,4 +245,31 @@ To solve these challenges, I built a fully automated incident response pipeline.
 Two different attacks were performed from the Kali EC2 instance against the Target EC2 instance in order to trigger GuardDuty findings:
 - SSH Brute-Force Attack: GuardDuty detected repeated failed SSH login attempts originating from the attacker instance, classifying it as a brute-force attack against the Target EC2.
 - Communication with Custom Threat List: Since the attacker’s IP address had been added to the custom Threat-IP list (S3), any communication between the Target EC2 and this IP was flagged. GuardDuty raised a finding that the Target EC2 was communicating with an IP on the custom threat list.
+
+### 5.2 GuardDuty Detection
+1. Open the GuardDuty Console in AWS.
+2. Within a few minutes, you should see a new Security Finding appear, such as:
+   <img width="1286" height="63" alt="image" src="https://github.com/user-attachments/assets/07f49575-6606-4633-a2bb-e284fb25aaf0" />
+   <img width="1306" height="78" alt="image" src="https://github.com/user-attachments/assets/7b57677b-6240-4e20-8264-6fe57a585ad2" />
+
+### 5.3 Automatic Quarantine
+1. Once GuardDuty raises a finding, the EventBridge rule forwards it to your IncidentResponder Lambda.
+2. The Lambda automatically:
+- Tags the target instance as Quarantined.
+- Detaches its current Security Group(s).
+- Attaches the Deny-All Security Group to block all inbound/outbound traffic.
+- Publishes an alert to the SNS Topic you created.
+
+## Target EC2 Tags showing "Quarantined"
+<img width="954" height="289" alt="image" src="https://github.com/user-attachments/assets/c28d8e68-149b-4401-8eb8-57a2ac23f1da" />
+
+## Target EC2 Security group
+<img width="548" height="293" alt="image" src="https://github.com/user-attachments/assets/b5123e1b-99d8-48ab-8d60-2709a38232ce" />
+
+## Alert email
+<img width="1668" height="626" alt="image" src="https://github.com/user-attachments/assets/b1a5fea7-5d65-4c36-bc0b-cc0b5aaf53f8" />
+
+
+
+
 
