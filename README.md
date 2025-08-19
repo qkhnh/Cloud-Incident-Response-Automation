@@ -19,16 +19,16 @@ This project automates threat detection and response in AWS using GuardDuty, Eve
 
 
 
-## 1. Project Overview & Objectives
+# 1. Project Overview & Objectives
 When managing infrastructure on AWS, detecting and responding to security incidents quickly is essential. Manual incident response processes such as identifying compromised EC2 instances, isolating them, and notifying the security team can take significant time and effort. During this delay, attackers may continue exfiltrating sensitive data, causing increased security risks and potential damage to the business.
 
 To solve these challenges, I built a fully automated incident response pipeline. This pipeline instantly detects malicious activity, isolates compromised instances, tags affected resources clearly, and alerts the security team through real-time notifications.
 
-## 2. Architecture Diagram & Data Flow
+# 2. Architecture Diagram & Data Flow
 <img width="1820" height="1253" alt="image" src="https://github.com/user-attachments/assets/6e1312fc-dd6d-46ac-86d8-4c11a8072242" />
 
 
-## 3. Tools & AWS Services Used
+# 3. Tools & AWS Services Used
 1. Amazon EC2
 2. Amazon S3
 3. Amazon SNS
@@ -41,7 +41,7 @@ To solve these challenges, I built a fully automated incident response pipeline.
 10. AWS Lambda
 
 
-## 4. Build Steps
+# 4. Build Steps
 
 ### 4.1 Create a custom Threat-IP list (S3) 
 1. Open Notepad, VS Code, or any plain text editor then type the attacker's IP address (no headers or quotes)
@@ -240,7 +240,7 @@ To solve these challenges, I built a fully automated incident response pipeline.
     - Event source: AWS services → GuardDuty → Event type: GuardDuty Finding → Next
     - Target: Lambda function → GuardDutyIncidentResponder → Next → Create rule
  
-## 5. Attack Simulation & Results
+# 5. Attack Simulation & Results
 ### 5.1 Attacks Conducted
 Two different attacks were performed from the Kali EC2 instance against the Target EC2 instance in order to trigger GuardDuty findings:
 - SSH Brute-Force Attack: GuardDuty detected repeated failed SSH login attempts originating from the attacker instance, classifying it as a brute-force attack against the Target EC2.
