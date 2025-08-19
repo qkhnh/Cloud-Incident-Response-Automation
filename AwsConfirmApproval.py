@@ -1,12 +1,9 @@
 import os, json, boto3, logging, time, hmac, hashlib
 from urllib.parse import parse_qs, quote_plus
-
-# --- env ---
 RESTORE_FN          = os.environ.get("RESTORE_FUNCTION_NAME", "").strip()
 TOKENS_TABLE        = os.environ.get("INCIDENT_TOKENS_TABLE", "").strip()
 APPROVAL_SECRET_PARAM = os.environ.get("APPROVAL_SECRET_PARAM", "").strip()
 
-# --- setup ---
 log = logging.getLogger()
 log.setLevel(logging.INFO)
 lambda_client = boto3.client("lambda")
@@ -75,7 +72,7 @@ def lambda_handler(event, context):
 
     instance_id   = (qs.get("instanceId") or qs.get("InstanceId") or "").strip()
     finding_id    = (qs.get("findingId") or "").strip()
-    finding_title = (qs.get("findingTitle") or "").strip()  # optional: nicer display
+    finding_title = (qs.get("findingTitle") or "").strip()  
     token         = (qs.get("token") or "").strip()
     sig           = (qs.get("sig") or "").strip()
     confirm       = (qs.get("confirm") or "").lower()
@@ -171,3 +168,4 @@ def lambda_handler(event, context):
     except Exception as e:
         log.exception("Invoke restore failed")
         return _html("Error", f"<h1>Failed to invoke restore</h1><p>{_esc(str(e))}</p>")
+
